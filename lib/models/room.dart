@@ -3,6 +3,7 @@ class Room {
   final double rating;
   final bool isCleaned;
   final bool isInProgress;
+  final bool isMaintenance;
   final int area;
   final int beds;
   final int maxOccupancy;
@@ -13,6 +14,7 @@ class Room {
     required this.rating,
     required this.isCleaned,
     required this.isInProgress,
+    required this.isMaintenance,
     required this.area,
     required this.beds,
     required this.maxOccupancy,
