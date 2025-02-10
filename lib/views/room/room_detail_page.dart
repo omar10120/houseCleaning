@@ -12,6 +12,10 @@ class RoomDetailPage extends StatefulWidget {
 
 class _RoomDetailPageState extends State<RoomDetailPage>
     with SingleTickerProviderStateMixin {
+  static const Color primaryBlue = Color(0xFF2196F3);
+  static const Color successGreen = Color(0xFF4CAF50);
+  static const Color cardBackground = Color(0xFFF5F7FA);
+
   late TabController _tabController;
   Map<String, bool> departmentChecklist = {
     'Bathroom': false,
@@ -28,6 +32,50 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     'Living Room': 'Emma',
     'Balcony': 'David',
   };
+
+  final TextEditingController _itemNameController = TextEditingController();
+  final TextEditingController _itemCountController = TextEditingController();
+  final List<Map<String, dynamic>> minibarItems = [
+    {'name': 'Water Bottles', 'count': 2},
+    {'name': 'Soft Drinks', 'count': 3},
+    {'name': 'Snacks', 'count': 4},
+  ];
+
+  final Map<String, List<String>> primaryItems = {
+    'Bathroom': ['Wipes', 'Shampoo', 'Soap', 'Towels'],
+    'Bedroom': ['Bed Sheets', 'Pillows', 'Blankets'],
+    'Kitchen': ['Utensils', 'Plates', 'Glasses'],
+    'Living Room': ['Couch', 'TV', 'Coffee Table'],
+  };
+
+  final Map<String, String> itemNotes = {};
+  final Map<String, List<String>> selectedItems = {
+    'Bathroom': [],
+    'Bedroom': [],
+    'Kitchen': [],
+    'Living Room': [],
+  };
+
+  void showSuccessSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 12),
+            Text(message),
+          ],
+        ),
+        backgroundColor: successGreen,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -48,10 +96,10 @@ class _RoomDetailPageState extends State<RoomDetailPage>
         slivers: [
           //image scetion
           SliverAppBar(
-            expandedHeight: 80,
+            expandedHeight: 100,
             pinned: true,
             leading: Container(
-              margin: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(12),
@@ -82,21 +130,21 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: Colors.blue,
                   tabs: const [
-                    Tab(text: 'Overview'),
                     Tab(text: 'Details'),
                     Tab(text: 'Minibar'),
                     Tab(text: 'Schedule'),
+                    Tab(text: 'Maintenance'),
                   ],
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height - 400,
+                  height: MediaQuery.of(context).size.height - 200,
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildOverviewTab(),
                       _buildDetailsTab(),
                       _buildMinibarTab(),
                       _buildScheduleTab(),
+                      _buildMaintenanceTab(),
                     ],
                   ),
                 ),
@@ -108,8 +156,8 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     );
   }
 
-  Widget _buildOverviewTab() {
-    return Padding(
+  Widget _buildMaintenanceTab() {
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,38 +189,62 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Premium Suite',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildInfoColumn('Size', '32m²'),
-              _buildInfoColumn('Occupancy', '2 Adults'),
-              _buildInfoColumn('Rating', '4.5 ★'),
-            ],
-          ),
           const SizedBox(height: 24),
           const Text(
-            'Description',
+            'Maintenance Notice',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'Luxurious and spacious room featuring modern amenities, a comfortable king-size bed, and a stunning view. Perfect for both business and leisure travelers seeking comfort and style.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              height: 1.5,
+          const SizedBox(height: 16),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Add Maintenance Notice',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: primaryBlue, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: cardBackground,
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      showSuccessSnackBar(
+                          context, 'Maintenance notice added successfully');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryBlue,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      'Submit Notice',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -186,72 +258,257 @@ class _RoomDetailPageState extends State<RoomDetailPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Text(
+                'Room ${widget.room.number}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Cleaned',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
           const Text(
-            'Cleaning Status',
+            'Room Items',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          ...departmentChecklist.keys.map((department) => Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: Transform.scale(
-                    scale: 1.2,
-                    child: Checkbox(
-                      value: departmentChecklist[department],
-                      onChanged: (bool? value) {
+          ...primaryItems.entries.map((entry) {
+            String category = entry.key;
+            List<String> items = entry.value;
+
+            return Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      category,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: items.map((item) {
+                        bool isSelected =
+                            selectedItems[category]?.contains(item) ?? false;
+                        return FilterChip(
+                          label: Text(item),
+                          selected: isSelected,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedItems[category]?.add(item);
+                              } else {
+                                selectedItems[category]?.remove(item);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Notes for $category',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: primaryBlue, width: 2),
+                        ),
+                        filled: true,
+                        fillColor: cardBackground,
+                      ),
+                      maxLines: 2,
+                      onChanged: (value) {
                         setState(() {
-                          departmentChecklist[department] = value ?? false;
+                          itemNotes[category] = value;
                         });
                       },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                      controller:
+                          TextEditingController(text: itemNotes[category]),
                     ),
-                  ),
-                  title: Text(
-                    department,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  trailing: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      staffAssignments[department] ?? '',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              )),
+              ),
+            );
+          }).toList(),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              showSuccessSnackBar(context, 'Changes saved successfully');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryBlue,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+            child: const Text(
+              'Save Changes',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildMinibarTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Text(
+                'Room ${widget.room.number}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Cleaned',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Add New Item',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _itemNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Item Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: primaryBlue, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: cardBackground,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _itemCountController,
+                    decoration: InputDecoration(
+                      labelText: 'Quantity',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: primaryBlue, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: cardBackground,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_itemNameController.text.isNotEmpty &&
+                          _itemCountController.text.isNotEmpty) {
+                        setState(() {
+                          minibarItems.add({
+                            'name': _itemNameController.text,
+                            'count': int.parse(_itemCountController.text),
+                          });
+                          _itemNameController.clear();
+                          _itemCountController.clear();
+                        });
+                        showSuccessSnackBar(context, 'Item added successfully');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryBlue,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      'Add Item',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           const Text(
             'Minibar Items',
             style: TextStyle(
@@ -260,9 +517,32 @@ class _RoomDetailPageState extends State<RoomDetailPage>
             ),
           ),
           const SizedBox(height: 16),
-          _buildMinibarItem('Water Bottles', 2),
-          _buildMinibarItem('Soft Drinks', 3),
-          _buildMinibarItem('Snacks', 4),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: minibarItems.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: Key(minibarItems[index]['name']),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 16),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  setState(() {
+                    minibarItems.removeAt(index);
+                  });
+                },
+                child: _buildMinibarItem(
+                  minibarItems[index]['name'],
+                  minibarItems[index]['count'],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -296,11 +576,39 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   }
 
   Widget _buildScheduleTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Text(
+                'Room ${widget.room.number}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Cleaned',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
           const Text(
             'Cleaning History',
             style: TextStyle(
@@ -309,154 +617,94 @@ class _RoomDetailPageState extends State<RoomDetailPage>
             ),
           ),
           const SizedBox(height: 16),
-          // Last Cleaned
-          Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 24,
+          ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _buildScheduleItem(
+                'Last Cleaned',
+                '2 hours ago',
+                'John Smith',
+                Icons.check_circle,
+                Colors.green,
+              ),
+              const SizedBox(height: 8),
+              _buildScheduleItem(
+                'Deep Cleaning',
+                'Yesterday, 2:30 PM',
+                'Sarah Johnson',
+                Icons.check_circle,
+                Colors.green,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Upcoming Schedule',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Last Cleaned',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '2 hours ago',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Assigned to: John Smith',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+              ),
+              const SizedBox(height: 16),
+              _buildScheduleItem(
+                'Regular Cleaning',
+                'Tomorrow, 10:00 AM',
+                'Mike Wilson',
+                Icons.schedule,
+                Colors.orange,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleItem(
+    String title,
+    String time,
+    String assignedTo,
+    IconData icon,
+    Color iconColor,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Deep Cleaning
-          Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Deep Cleaning',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Yesterday, 2:30 PM',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Assigned to: Sarah Johnson',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 4),
+                Text(
+                  time,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Upcoming Schedule',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.schedule,
-                  color: Colors.orange,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Regular Cleaning',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tomorrow, 10:00 AM',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Assigned to: Mike Wilson',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 2),
+                Text(
+                  'Assigned to: $assignedTo',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
@@ -464,28 +712,6 @@ class _RoomDetailPageState extends State<RoomDetailPage>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoColumn(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
     );
   }
 }

@@ -42,15 +42,15 @@ class _HomePageState extends State<HomePage> {
           area: 48,
           beds: 2,
           maxOccupancy: 4),
-      Room(
-          number: '104',
-          rating: 5.0,
-          isCleaned: false,
-          isInProgress: false,
-          isMaintenance: true,
-          area: 48,
-          beds: 2,
-          maxOccupancy: 4),
+      // Room(
+      //     number: '104',
+      //     rating: 5.0,
+      //     isCleaned: false,
+      //     isInProgress: false,
+      //     isMaintenance: true,
+      //     area: 48,
+      //     beds: 2,
+      //     maxOccupancy: 4),
     ],
     2: [
       Room(
@@ -80,15 +80,15 @@ class _HomePageState extends State<HomePage> {
           area: 45,
           beds: 2,
           maxOccupancy: 4),
-      Room(
-          number: '204',
-          rating: 2.2,
-          isCleaned: false,
-          isInProgress: false,
-          isMaintenance: true,
-          area: 45,
-          beds: 2,
-          maxOccupancy: 4),
+      // Room(
+      //     number: '204',
+      //     rating: 2.2,
+      //     isCleaned: false,
+      //     isInProgress: false,
+      //     isMaintenance: true,
+      //     area: 45,
+      //     beds: 2,
+      //     maxOccupancy: 4),
     ],
     3: [
       Room(
@@ -118,15 +118,15 @@ class _HomePageState extends State<HomePage> {
           area: 50,
           beds: 2,
           maxOccupancy: 4),
-      Room(
-          number: '304',
-          rating: 4.3,
-          isCleaned: false,
-          isInProgress: false,
-          isMaintenance: true,
-          area: 50,
-          beds: 2,
-          maxOccupancy: 4),
+      // Room(
+      //     number: '304',
+      //     rating: 4.3,
+      //     isCleaned: false,
+      //     isInProgress: false,
+      //     isMaintenance: true,
+      //     area: 50,
+      //     beds: 2,
+      //     maxOccupancy: 4),
     ],
   };
 
