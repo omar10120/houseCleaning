@@ -41,34 +41,34 @@ class _LoginPageState extends State<LoginPage> {
                 height: 300,
               ),
               const SizedBox(height: 48),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  hintText: 'email',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  prefixIcon: const Icon(Icons.email_outlined),
-                ),
-              ),
-              const SizedBox(height: 16),
               // TextField(
-              //   controller: _passwordController,
-              //   obscureText: true,
+              //   controller: _emailController,
               //   decoration: InputDecoration(
-              //     hintText: 'password',
+              //     hintText: 'email',
               //     filled: true,
               //     fillColor: Colors.white,
               //     border: OutlineInputBorder(
               //       borderRadius: BorderRadius.circular(8),
               //       borderSide: BorderSide.none,
               //     ),
-              //     prefixIcon: const Icon(Icons.lock_outline),
+              //     prefixIcon: const Icon(Icons.email_outlined),
               //   ),
               // ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'password',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                ),
+              ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,

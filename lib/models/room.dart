@@ -1,26 +1,52 @@
 class Room {
-  final String number;
-  final double rating;
-  final bool isCleaned;
-  final bool isInProgress;
-  final bool isMaintenance;
-  final int area;
-  final int beds;
-  final int maxOccupancy;
-  final List<String> images;
+  final String guid;
+  final int number;
+  final String code;
+  final String name;
+  final int badsNumber;
+  final double price;
+  final String overLooking;
+  final String roomType;
+  final int status;
+  final String notes;
+  final String floorGUID;
+  final DateTime? lastClean;
+
+  // Keep these for UI purposes
+  bool get isCleaned => status == 0;
+  bool get isInProgress => status == 1;
+  bool get isMaintenance => status == 2;
 
   Room({
+    required this.guid,
     required this.number,
-    required this.rating,
-    required this.isCleaned,
-    required this.isInProgress,
-    required this.isMaintenance,
-    required this.area,
-    required this.beds,
-    required this.maxOccupancy,
-    this.images = const [
-      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop'
-    ],
+    required this.code,
+    required this.name,
+    required this.badsNumber,
+    required this.price,
+    required this.overLooking,
+    required this.roomType,
+    required this.status,
+    required this.notes,
+    required this.floorGUID,
+    this.lastClean,
   });
+
+  factory Room.fromJson(Map<String, dynamic> json) {
+    return Room(
+      guid: json['GUID'],
+      number: json['Number'],
+      code: json['Code'],
+      name: json['Name'],
+      badsNumber: json['BadsNumber'],
+      price: json['Price'].toDouble(),
+      overLooking: json['OverLooking'],
+      roomType: json['RoomType'],
+      status: json['Status'],
+      notes: json['Notes'],
+      floorGUID: json['FloorGUID'],
+      lastClean:
+          json['LastClean'] != null ? DateTime.parse(json['LastClean']) : null,
+    );
+  }
 }
