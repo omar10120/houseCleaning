@@ -218,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                                     Row(
                                       children: [
                                         const Icon(Icons.square_foot, size: 20),
-                                        Text(' ${room.badsNumber}m²'),
+                                        Text(' ${room.roomType}'),
                                       ],
                                     ),
                                     Row(
@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                       children: [
                                         const Icon(Icons.person_outline,
                                             size: 20),
-                                        Text(' Max ${room.badsNumber}'),
+                                        Text('  ${room.overLooking}'),
                                       ],
                                     ),
                                   ],
@@ -269,12 +269,12 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.cleaning_services),
-            label: 'Tasks',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
         ],
       ),
