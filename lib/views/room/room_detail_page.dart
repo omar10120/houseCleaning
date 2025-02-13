@@ -209,6 +209,22 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                 children: [
                   TextField(
                     decoration: InputDecoration(
+                      labelText: 'Add Maintenance Title',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: primaryBlue, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: cardBackground,
+                    ),
+                    maxLines: 1,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
                       labelText: 'Add Maintenance Notice',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -308,12 +324,22 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      category,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          category,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(), // Pushes the icon to the right
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline,
+                              color: Colors.blue),
+                          onPressed: () => _addItem(category),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Wrap(
@@ -623,7 +649,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
             children: [
               _buildScheduleItem(
                 'Last Cleaned',
-                '2 hours ago',
+                widget.room.lastClean,
                 'John Smith',
                 Icons.check_circle,
                 Colors.green,
@@ -631,7 +657,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               const SizedBox(height: 8),
               _buildScheduleItem(
                 'Deep Cleaning',
-                'Yesterday, 2:30 PM',
+                widget.room.lastClean,
                 'Sarah Johnson',
                 Icons.check_circle,
                 Colors.green,
@@ -647,7 +673,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               const SizedBox(height: 16),
               _buildScheduleItem(
                 'Regular Cleaning',
-                'Tomorrow, 10:00 AM',
+                widget.room.lastClean,
                 'Mike Wilson',
                 Icons.schedule,
                 Colors.orange,
@@ -661,7 +687,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
 
   Widget _buildScheduleItem(
     String title,
-    String time,
+    DateTime? time,
     String assignedTo,
     IconData icon,
     Color iconColor,
@@ -693,7 +719,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  time,
+                  time != null ? time.toString() : 'No Time',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -715,3 +741,5 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     );
   }
 }
+
+void _addItem(String category) {}

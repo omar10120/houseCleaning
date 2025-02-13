@@ -26,8 +26,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchFloors() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://localhost:3000/api/hotel-floors'));
+      final response = await http
+          .get(Uri.parse('http://192.168.1.105:3000/api/hotel-floors'));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
@@ -62,7 +62,8 @@ class _HomePageState extends State<HomePage> {
       });
 
       final response = await http.get(
-        Uri.parse('http://localhost:3000/api/hotelRooms?FloorGUID=$floorGUID'),
+        Uri.parse(
+            'http://192.168.1.105:3000/api/hotelRooms?FloorGUID=$floorGUID'),
       );
 
       if (response.statusCode == 200) {

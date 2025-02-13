@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,22 +11,59 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
-    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
-    // For now, just navigate to home page
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
-    );
+  Future<void> _handleLogin() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await http
+          .get(Uri.parse('http://94.127.214.117:3000/api/houseKeepers'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        // ✅ Check if the password exists in the response
+        bool isValid = data.any((houseKeeper) =>
+            houseKeeper['Password'] == _passwordController.text);
+
+        if (isValid) {
+          // ✅ Password matched, navigate to HomePage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else {
+          // ❌ Invalid password, show error
+          setState(() {
+            _errorMessage = "Invalid password. Please try again.";
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = "Server error. Please try again.";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = "Failed to connect to the server.";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -41,20 +80,6 @@ class _LoginPageState extends State<LoginPage> {
                 height: 300,
               ),
               const SizedBox(height: 48),
-              // TextField(
-              //   controller: _emailController,
-              //   decoration: InputDecoration(
-              //     hintText: 'email',
-              //     filled: true,
-              //     fillColor: Colors.white,
-              //     border: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //       borderSide: BorderSide.none,
-              //     ),
-              //     prefixIcon: const Icon(Icons.email_outlined),
-              //   ),
-              // ),
-              const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -69,12 +94,23 @@ class _LoginPageState extends State<LoginPage> {
                   prefixIcon: const Icon(Icons.lock_outline),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+
+              // ❌ Show error message if login fails
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -82,7 +118,9 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Login'),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Login'),
                 ),
               ),
             ],
