@@ -7,10 +7,11 @@ class Room {
   final double price;
   final String overLooking;
   final String roomType;
-  final int status;
+  int status; // ✅ Changed from String to int
   final String notes;
   final String floorGUID;
   final DateTime? lastClean;
+  final String? statusDescription;
 
   // Keep these for UI purposes
   bool get isCleaned => status == 0;
@@ -26,10 +27,11 @@ class Room {
     required this.price,
     required this.overLooking,
     required this.roomType,
-    required this.status,
+    required this.status, // ✅ Ensure status is an int
     required this.notes,
     required this.floorGUID,
     this.lastClean,
+    this.statusDescription,
   });
 
   factory Room.fromJson(Map<String, dynamic> json) {
@@ -39,14 +41,18 @@ class Room {
       code: json['Code'],
       name: json['Name'],
       badsNumber: json['BadsNumber'],
-      price: json['Price'].toDouble(),
-      overLooking: json['OverLooking'],
-      roomType: json['RoomType'],
-      status: json['Status'],
-      notes: json['Notes'],
+      price: (json['Price'] as num).toDouble(), // ✅ Ensure price is double
+      overLooking: json['OverLooking'] ?? "",
+      roomType: json['RoomType'] ?? "",
+      status: json['Status'] is int
+          ? json['Status']
+          : int.tryParse(json['Status'].toString()) ?? 0, // ✅ Fix TypeError
+      notes: json['Notes'] ?? "",
       floorGUID: json['FloorGUID'],
-      lastClean:
-          json['LastClean'] != null ? DateTime.parse(json['LastClean']) : null,
+      statusDescription: json['statusDescription'],
+      lastClean: json['LastClean'] != null
+          ? DateTime.tryParse(json['LastClean'])
+          : null,
     );
   }
 }

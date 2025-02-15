@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.1.105:3000/api/houseKeepers'));
+          .get(Uri.parse('http://94.127.214.117:3000/api/houseKeepers'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);

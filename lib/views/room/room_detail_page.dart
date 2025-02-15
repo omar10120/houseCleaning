@@ -16,8 +16,6 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color cardBackground = Color(0xFFF5F7FA);
 
-
-
   late TabController _tabController;
   Map<String, bool> departmentChecklist = {
     'Bathroom': false,

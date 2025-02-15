@@ -15,7 +15,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedFloorIndex = 0;
   List<Floor> floors = [];
-  List<Room> rooms = [];
   bool isLoading = true;
 
   @override
@@ -26,58 +25,51 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchFloors() async {
     try {
-      final response = await http
-          .get(Uri.parse('http://192.168.1.105:3000/api/hotel-floors'));
+      final response =
+          await http.get(Uri.parse('http://localhost:3000/api/hotel-floors'));
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        // Convert API response to Floor objects
         List<Floor> fetchedFloors =
             data.map((json) => Floor.fromJson(json)).toList();
 
         if (fetchedFloors.isNotEmpty) {
-          // ✅ Find the floor with the lowest Number value
           fetchedFloors.sort((a, b) => a.number.compareTo(b.number));
-          String selectedFloorGUID = fetchedFloors.first.guid;
 
           setState(() {
             floors = fetchedFloors;
-            selectedFloorIndex =
-                floors.indexWhere((floor) => floor.guid == selectedFloorGUID);
+            selectedFloorIndex = 0;
           });
-
-          // Fetch rooms for the selected floor
-          await fetchRooms(selectedFloorGUID);
         }
       }
     } catch (e) {
       print('Error fetching floors: $e');
-    }
-  }
-
-  Future<void> fetchRooms(String floorGUID) async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      final response = await http.get(
-        Uri.parse(
-            'http://192.168.1.105:3000/api/hotelRooms?FloorGUID=$floorGUID'),
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          rooms = data.map((json) => Room.fromJson(json)).toList();
-        });
-      }
-    } catch (e) {
-      print('Error fetching rooms: $e');
     } finally {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> updateRoomStatus(String roomGuid, int newStatus) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('http://localhost:3000/api/hotel-floors'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'roomGuid': roomGuid, 'status': newStatus}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Room status updated successfully');
+
+        // ✅ Fetch updated data after successful update
+        fetchFloors();
+      } else {
+        print('Failed to update room status');
+      }
+    } catch (e) {
+      print('Error updating room status: $e');
     }
   }
 
@@ -133,7 +125,6 @@ class _HomePageState extends State<HomePage> {
                       setState(() {
                         selectedFloorIndex = index;
                       });
-                      fetchRooms(floors[index].guid);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: selectedFloorIndex == index
@@ -146,8 +137,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text(
-                        'Floor ${floors[index].number}'), // ✅ Updated text to match `Number`
+                    child: Text('Floor ${floors[index].number}'),
                   ),
                 ),
               ),
@@ -160,99 +150,109 @@ class _HomePageState extends State<HomePage> {
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: rooms.length,
+                    itemCount: floors[selectedFloorIndex].rooms.length,
                     itemBuilder: (context, index) {
-                      final room = rooms[index];
+                      final room = floors[selectedFloorIndex].rooms[index];
                       return Card(
                         margin: const EdgeInsets.only(bottom: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RoomDetailPage(room: room),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 🔹 Room Title & Favorite Icon
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Room ${room.name}',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.favorite_border),
+                                    onPressed: () {},
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Room ${room.name}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.favorite_border),
-                                      onPressed: () {},
-                                    ),
-                                  ],
+
+                              const SizedBox(height: 16),
+
+                              // 🔹 Room Status Dropdown
+                              _buildStatusDropdown(room),
+
+                              const SizedBox(height: 16),
+
+                              // 🔹 Room Status Label (Badge)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      _getStatusColor(room.statusDescription),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.star,
-                                        color: Colors.amber, size: 20),
-                                    const SizedBox(width: 4),
-                                    Text('4.5'),
-                                  ],
+                                child: Text(
+                                  room.statusDescription ?? '',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                const SizedBox(height: 8),
-                                _buildStatusChip(room.status),
-                                const SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.square_foot, size: 20),
-                                        Text(' ${room.roomType}'),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.bed, size: 20),
-                                        Text(' ${room.badsNumber} Beds'),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.person_outline,
-                                            size: 20),
-                                        Text('  ${room.overLooking}'),
-                                      ],
-                                    ),
-                                  ],
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // 🔹 Room Details (Back View, Beds, Suite)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.landscape,
+                                          size: 18, color: Colors.black54),
+                                      const SizedBox(width: 4),
+                                      const Text("Back View"),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.bed,
+                                          size: 18, color: Colors.black54),
+                                      const SizedBox(width: 4),
+                                      Text('${room.badsNumber} Beds'),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.apartment,
+                                          size: 18, color: Colors.black54),
+                                      const SizedBox(width: 4),
+                                      const Text("Suite"),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // 🔹 Last Clean Date
+                              Text(
+                                'Last Clean: ${room.lastClean ?? "Not Cleaned"}',
+                                style: const TextStyle(
+                                  color: Color.fromARGB(255, 223, 69, 13),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Last Clean:  ${room.lastClean}',
-                                      style: const TextStyle(
-                                        color: Color.fromARGB(255, 223, 69, 13),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -261,58 +261,49 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildStatusChip(int status) {
-    String label;
-    Color color;
+  Widget _buildStatusDropdown(Room room) {
+    final Map<int, String> statusOptions = {
+      0: "Normal",
+      1: "CleanRequest",
+      2: "OutOfService",
+    };
 
-    switch (status) {
-      case 0:
-        label = 'Cleaned';
-        color = Colors.green;
-        break;
-      case 1:
-        label = 'In Progress';
-        color = Colors.orange;
-        break;
-      case 2:
-        label = 'Needs Cleaning';
-        color = Colors.red;
-        break;
-      default:
-        label = 'Unknown';
-        color = Colors.grey;
-    }
+    return DropdownButton<int>(
+      value: room.status,
+      icon: const Icon(Icons.arrow_drop_down),
+      isExpanded: true,
+      style: const TextStyle(fontSize: 16, color: Colors.black),
+      onChanged: (int? newStatus) {
+        if (newStatus != null) {
+          setState(() {
+            room.status = newStatus;
+          });
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: color),
-      ),
+          updateRoomStatus(room.guid, newStatus);
+        }
+      },
+      items: statusOptions.entries.map((entry) {
+        return DropdownMenuItem<int>(
+          value: entry.key,
+          child: Text(entry.value),
+        );
+      }).toList(),
     );
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'available':
+        return Colors.green; // ✅ Green for Available
+      case 'dirty':
+        return Colors.red; // ✅ Red for Dirty
+      case 'reserved':
+        return Colors.orange; // ✅ Orange for Reserved
+      default:
+        return Colors.black54;
+    }
   }
 }
