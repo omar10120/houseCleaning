@@ -5,7 +5,9 @@ import '../../models/room.dart';
 import '../../models/floor.dart';
 import '../../components/settings_page.dart';
 import '../../components/bottom_nav_bar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../room/room_detail_page.dart';
+import '../profile/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -88,37 +90,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         const SizedBox(height: 16),
         // Floor Selection
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: List.generate(
-              floors.length,
-              (index) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedFloorIndex = index;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: selectedFloorIndex == index
-                        ? Colors.black
-                        : Colors.grey[200],
-                    foregroundColor: selectedFloorIndex == index
-                        ? Colors.white
-                        : Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text('Floor ${floors[index].number}'),
-                ),
-              ),
-            ),
-          ),
-        ),
+        _buildFloorButtons(),
         const SizedBox(height: 16),
         // Rooms List
         Expanded(
@@ -127,104 +99,7 @@ class _HomePageState extends State<HomePage> {
             itemCount: floors[selectedFloorIndex].rooms.length,
             itemBuilder: (context, index) {
               final room = floors[selectedFloorIndex].rooms[index];
-              return Card(
-                margin: const EdgeInsets.all(8),
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RoomDetailPage(room: room),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Room ${room.name}',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.favorite_border),
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        _buildStatusDropdown(room),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(room.status),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            _getStatusText(room.status),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.landscape,
-                                    size: 18, color: Colors.black54),
-                                const SizedBox(width: 4),
-                                const Text("Back View"),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Icon(Icons.bed,
-                                    size: 18, color: Colors.black54),
-                                const SizedBox(width: 4),
-                                Text('${room.badsNumber} Beds'),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Icon(Icons.apartment,
-                                    size: 18, color: Colors.black54),
-                                const SizedBox(width: 4),
-                                const Text("Suite"),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Last Clean: ${room.lastClean ?? "Not Cleaned"}',
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 223, 69, 13),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return _buildRoomCard(room);
             },
           ),
         ),
@@ -232,8 +107,52 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildFloorButtons() {
+    final l10n = AppLocalizations.of(context)!;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: List.generate(
+          floors.length,
+          (index) => Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  selectedFloorIndex = index;
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    selectedFloorIndex == index ? Colors.black : Colors.grey[300],
+                foregroundColor:
+                    selectedFloorIndex == index ? Colors.white : Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                '${l10n.floor} ${floors[index].name}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final List<Widget> pages = [
       PageStorage(
         bucket: PageStorageBucket(),
@@ -241,20 +160,20 @@ class _HomePageState extends State<HomePage> {
       ),
       PageStorage(
         bucket: PageStorageBucket(),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cleaning_services, size: 64, color: Colors.blue),
-              SizedBox(height: 16),
+              const Icon(Icons.cleaning_services, size: 64, color: Colors.blue),
+              const SizedBox(height: 16),
               Text(
-                'Cleaning Tasks',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                l10n.cleaning,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Coming Soon',
-                style: TextStyle(color: Colors.grey),
+                l10n.comingSoon,
+                style: const TextStyle(color: Colors.grey),
               ),
             ],
           ),
@@ -264,16 +183,22 @@ class _HomePageState extends State<HomePage> {
         bucket: PageStorageBucket(),
         child: const SettingsPage(),
       ),
+      PageStorage(
+        bucket: PageStorageBucket(),
+        child: const ProfilePage(),
+      ),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           _currentIndex == 0
-              ? 'House Keeping'
+              ? l10n.appName
               : _currentIndex == 1
-                  ? 'Cleaning Tasks'
-                  : 'Settings',
+                  ? l10n.cleaning
+                  : _currentIndex == 2
+                      ? l10n.settings
+                      : l10n.profile,
         ),
         centerTitle: true,
       ),
@@ -289,11 +214,114 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildRoomCard(Room room) {
+    final l10n = AppLocalizations.of(context)!;
+    return Card(
+      margin: const EdgeInsets.all(8),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RoomDetailPage(room: room),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${l10n.room} ${room.name}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildStatusDropdown(room),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(room.status),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _getStatusText(room.status),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.landscape,
+                          size: 18, color: Colors.black54),
+                      const SizedBox(width: 4),
+                      Text(l10n.backView),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.bed,
+                          size: 18, color: Colors.black54),
+                      const SizedBox(width: 4),
+                      Text('${room.badsNumber} ${l10n.beds}'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.apartment,
+                          size: 18, color: Colors.black54),
+                      const SizedBox(width: 4),
+                      Text(l10n.suite),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 223, 69, 13),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusDropdown(Room room) {
+    final l10n = AppLocalizations.of(context)!;
     final Map<int, String> statusOptions = {
-      0: "Clean",
-      1: "Clean Request",
-      2: "Out Of Service",
+      0: l10n.clean,
+      1: l10n.cleanRequest,
+      2: l10n.outOfService,
     };
 
     return DropdownButton<int>(
@@ -319,13 +347,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   String _getStatusText(int status) {
-    final Map<int, String> statusOptions = {
-      0: "Clean",
-      1: "Clean Request",
-      2: "Out Of Service",
-    };
-
-    return statusOptions[status] ?? '';
+    final l10n = AppLocalizations.of(context)!;
+    switch (status) {
+      case 0:
+        return l10n.clean;
+      case 1:
+        return l10n.cleanRequest;
+      case 2:
+        return l10n.outOfService;
+      default:
+        return '';
+    }
   }
 
   Color _getStatusColor(int status) {

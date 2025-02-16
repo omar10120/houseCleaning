@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/room.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RoomDetailPage extends StatefulWidget {
   final Room room;
@@ -91,6 +92,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -129,11 +131,11 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                   labelColor: Colors.blue,
                   unselectedLabelColor: Colors.grey,
                   indicatorColor: Colors.blue,
-                  tabs: const [
-                    Tab(text: 'Details'),
-                    Tab(text: 'Minibar'),
-                    Tab(text: 'Schedule'),
-                    Tab(text: 'Maintenance'),
+                  tabs: [
+                    Tab(text: l10n.details),
+                    Tab(text: l10n.minibar),
+                    Tab(text: l10n.schedule),
+                    Tab(text: l10n.maintenance),
                   ],
                 ),
                 SizedBox(
@@ -141,7 +143,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildDetailsTab(),
+                      _buildDetailsTab(context),
                       _buildMinibarTab(),
                       _buildScheduleTab(),
                       _buildMaintenanceTab(),
@@ -268,7 +270,8 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     );
   }
 
-  Widget _buildDetailsTab() {
+  Widget _buildDetailsTab(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -302,9 +305,9 @@ class _RoomDetailPageState extends State<RoomDetailPage>
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Room Items',
-            style: TextStyle(
+          Text(
+            l10n.roomItems,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -366,7 +369,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                     const SizedBox(height: 16),
                     TextField(
                       decoration: InputDecoration(
-                        labelText: 'Notes for $category',
+                        labelText: l10n.notesFor + ' $category',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -405,9 +408,9 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               ),
               elevation: 2,
             ),
-            child: const Text(
-              'Save Changes',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            child: Text(
+              l10n.saveChanges,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ],
