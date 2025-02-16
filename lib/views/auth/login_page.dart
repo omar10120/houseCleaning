@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../home/home_page.dart';
 import '/components/settings_page.dart';
+import '../about/about_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -71,34 +72,50 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0,
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.menu, color: Colors.grey),
+            icon: const Icon(Icons.menu),
             offset: const Offset(0, 40),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                value: 'login',
-                child: ListTile(
-                  leading: const Icon(Icons.login),
-                  title: const Text('Login'),
-                  selected: !_isSettingsOpen,
+            onSelected: (value) {
+              if (value == 'settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
+                );
+              } else if (value == 'about') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AboutPage(),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 8),
+                    Text('Settings'),
+                  ],
                 ),
               ),
-              PopupMenuItem<String>(
-                value: 'settings',
-                child: ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text('Settings'),
-                  selected: _isSettingsOpen,
+              const PopupMenuItem(
+                value: 'about',
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline),
+                    SizedBox(width: 8),
+                    Text('About'),
+                  ],
                 ),
               ),
             ],
-            onSelected: (String value) {
-              setState(() {
-                _isSettingsOpen = value == 'settings';
-              });
-            },
           ),
           const SizedBox(width: 8),
         ],
