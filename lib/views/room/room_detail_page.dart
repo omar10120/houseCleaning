@@ -277,7 +277,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
           Row(
             children: [
               Text(
-                'Room ${widget.room.number}',
+                'Room ${widget.room.name}',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

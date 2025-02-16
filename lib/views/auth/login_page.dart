@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../home/home_page.dart';
 import '/components/settings_page.dart';
-import '/components/bottom_nav_bar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
-  int _selectedIndex = 0; // Track selected tab
+  bool _isSettingsOpen = false;
 
   @override
   void dispose() {
@@ -64,23 +63,47 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _onNavTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _selectedIndex == 0
-          ? _buildLoginScreen()
-          : const SettingsPage(), // ✅ Switch to Settings Page
-
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _selectedIndex,
-        onTap: _onNavTap,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.menu, color: Colors.grey),
+            offset: const Offset(0, 40),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'login',
+                child: ListTile(
+                  leading: const Icon(Icons.login),
+                  title: const Text('Login'),
+                  selected: !_isSettingsOpen,
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: const Text('Settings'),
+                  selected: _isSettingsOpen,
+                ),
+              ),
+            ],
+            onSelected: (String value) {
+              setState(() {
+                _isSettingsOpen = value == 'settings';
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
+      body: _isSettingsOpen ? const SettingsPage() : _buildLoginScreen(),
     );
   }
 
@@ -99,38 +122,51 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                 hintText: 'password',
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
                 prefixIcon: const Icon(Icons.lock_outline),
               ),
             ),
-            const SizedBox(height: 16),
             if (_errorMessage != null)
               Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
+            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              height: 48,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleLogin,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Login'),
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],
