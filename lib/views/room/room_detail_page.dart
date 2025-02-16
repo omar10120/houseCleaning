@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/room.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../services/maintenance_service.dart';
+import '../../models/maintenance_request.dart';
+import '../../models/room.dart';
 
 class RoomDetailPage extends StatefulWidget {
   final Room room;
@@ -18,6 +20,13 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   static const Color cardBackground = Color(0xFFF5F7FA);
 
   late TabController _tabController;
+  final TextEditingController _maintenanceTitleController =
+      TextEditingController();
+  final TextEditingController _maintenanceNoticeController =
+      TextEditingController();
+  List<MaintenanceRequest> _maintenanceRequests = [];
+  bool _isLoading = false;
+
   Map<String, bool> departmentChecklist = {
     'Bathroom': false,
     'Kitchen': false,
@@ -82,12 +91,57 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadMaintenanceRequests();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Future<void> _loadMaintenanceRequests() async {
+    setState(() => _isLoading = true);
+    try {
+      final requests = await MaintenanceService.getMaintenanceRequests();
+      setState(() {
+        _maintenanceRequests = requests;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading maintenance requests: $e')),
+      );
+    }
+  }
+
+  Future<void> _submitMaintenanceRequest() async {
+    if (_maintenanceTitleController.text.isEmpty ||
+        _maintenanceNoticeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await MaintenanceService.createMaintenanceRequest(
+        maintenanceTitle: _maintenanceTitleController.text,
+        maintenanceStatement: _maintenanceNoticeController.text,
+        roomNumber: widget.room.number.toString(),
+      );
+
+      // Clear the form and reload the list
+      _maintenanceTitleController.clear();
+      _maintenanceNoticeController.clear();
+      await _loadMaintenanceRequests();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Maintenance request submitted successfully')),
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting maintenance request: $e')),
+      );
+    }
   }
 
   @override
@@ -159,115 +213,152 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   }
 
   Widget _buildMaintenanceTab() {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'Room ${widget.room.number}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Text(
-                  'Cleaned',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            'Room ${widget.room.name}',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              'Cleaned',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Maintenance Notice',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Add Maintenance Title',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: primaryBlue, width: 2),
-                      ),
-                      filled: true,
-                      fillColor: cardBackground,
-                    ),
-                    maxLines: 1,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Add Maintenance Notice',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: primaryBlue, width: 2),
-                      ),
-                      filled: true,
-                      fillColor: cardBackground,
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      showSuccessSnackBar(
-                          context, 'Maintenance notice added successfully');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: const Text(
-                      'Submit Notice',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
+          TextField(
+            controller: _maintenanceTitleController,
+            decoration: InputDecoration(
+              labelText: 'Add Maintenance Title',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _maintenanceNoticeController,
+            decoration: InputDecoration(
+              labelText: 'Add Maintenance Notice',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            maxLines: 4,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _submitMaintenanceRequest,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryBlue,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: _isLoading
+                  ? const CircularProgressIndicator()
+                  : const Text('Submit Notice'),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Recent Maintenance Requests',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _maintenanceRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = _maintenanceRequests[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        title: Text(request.maintenanceTitle),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(request.maintenanceStatement),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Request Number: ${request.requestNumber}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              'Status: ${_getStatusText(request.requestStatus)}',
+                              style: TextStyle(
+                                color: _getStatusColor(request.requestStatus),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );
+  }
+
+  String _getStatusText(int status) {
+    switch (status) {
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'In Progress';
+      case 2:
+        return 'Completed';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color _getStatusColor(int status) {
+    switch (status) {
+      case 0:
+        return Colors.orange;
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
   Widget _buildDetailsTab(BuildContext context) {
@@ -427,7 +518,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
           Row(
             children: [
               Text(
-                'Room ${widget.room.number}',
+                'Room ${widget.room.name}',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -613,7 +704,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
           Row(
             children: [
               Text(
-                'Room ${widget.room.number}',
+                'Room ${widget.room.name}',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -743,6 +834,14 @@ class _RoomDetailPageState extends State<RoomDetailPage>
       ),
     );
   }
-}
 
-void _addItem(String category) {}
+  void _addItem(String category) {}
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _maintenanceTitleController.dispose();
+    _maintenanceNoticeController.dispose();
+    super.dispose();
+  }
+}
