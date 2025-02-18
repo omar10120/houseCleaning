@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/language_provider.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+// import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,7 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? controller;
+  // QRViewController? controller;
   String? scannedApiUrl;
   bool isFlashOn = false;
   bool isFrontCamera = false;
@@ -36,27 +36,27 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        scannedApiUrl = scanData.code;
-        _isScanning = false;
-      });
-      controller.dispose();
-    });
-  }
+  // void _onQRViewCreated(QRViewController controller) {
+  //   this.controller = controller;
+  //   controller.scannedDataStream.listen((scanData) {
+  //     setState(() {
+  //       scannedApiUrl = scanData.code;
+  //       _isScanning = false;
+  //     });
+  //     controller.dispose();
+  //   });
+  // }
 
-  @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   controller?.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settings),
@@ -135,9 +135,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ],
                   onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      languageProvider.changeLanguage(newValue);
-                    }
+                    // if (newValue != null) {
+                    //   languageProvider.changeLanguage(newValue);
+                    // }
                   },
                 );
               },
@@ -162,17 +162,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 clipBehavior: Clip.hardEdge,
                 child: Stack(
                   children: [
-                    QRView(
-                      key: qrKey,
-                      onQRViewCreated: _onQRViewCreated,
-                      overlay: QrScannerOverlayShape(
-                        borderColor: Colors.blue,
-                        borderRadius: 10,
-                        borderLength: 30,
-                        borderWidth: 10,
-                        cutOutSize: 300,
-                      ),
-                    ),
+                    // QRView(
+                    //   key: qrKey,
+                    //   onQRViewCreated: _onQRViewCreated,
+                    //   overlay: QrScannerOverlayShape(
+                    //     borderColor: Colors.blue,
+                    //     borderRadius: 10,
+                    //     borderLength: 30,
+                    //     borderWidth: 10,
+                    //     cutOutSize: 300,
+                    //   ),
+                    // ),
                     Positioned(
                       bottom: 16,
                       left: 0,
@@ -186,18 +186,18 @@ class _SettingsPageState extends State<SettingsPage> {
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: IconButton(
-                              icon: Icon(
-                                isFlashOn ? Icons.flash_on : Icons.flash_off,
-                                color: Colors.white,
-                              ),
-                              onPressed: () async {
-                                await controller?.toggleFlash();
-                                setState(() {
-                                  isFlashOn = !isFlashOn;
-                                });
-                              },
-                            ),
+                            // child: IconButton(
+                            //   icon: Icon(
+                            //     isFlashOn ? Icons.flash_on : Icons.flash_off,
+                            //     color: Colors.white,
+                            //   ),
+                            // onPressed: () async {
+                            //   await controller?.toggleFlash();
+                            //   setState(() {
+                            //     isFlashOn = !isFlashOn;
+                            //   });
+                            // },
+                            // ),
                           ),
                           const SizedBox(width: 16),
                           // Camera switch button
@@ -206,20 +206,20 @@ class _SettingsPageState extends State<SettingsPage> {
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: IconButton(
-                              icon: Icon(
-                                isFrontCamera
-                                    ? Icons.camera_front
-                                    : Icons.camera_rear,
-                                color: Colors.white,
-                              ),
-                              onPressed: () async {
-                                await controller?.flipCamera();
-                                setState(() {
-                                  isFrontCamera = !isFrontCamera;
-                                });
-                              },
-                            ),
+                            // child: IconButton(
+                            //   icon: Icon(
+                            //     isFrontCamera
+                            //         ? Icons.camera_front
+                            //         : Icons.camera_rear,
+                            //     color: Colors.white,
+                            //   ),
+                            // onPressed: () async {
+                            //   await controller?.flipCamera();
+                            //   setState(() {
+                            //     isFrontCamera = !isFrontCamera;
+                            //   });
+                            // },
+                            // ),
                           ),
                           const SizedBox(width: 16),
                           // Close button
@@ -237,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 setState(() {
                                   _isScanning = false;
                                 });
-                                controller?.dispose();
+                                // controller?.dispose();
                               },
                             ),
                           ),

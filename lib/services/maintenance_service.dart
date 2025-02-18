@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/maintenance_request.dart';
 
 class MaintenanceService {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'http://94.127.214.117:3000/api';
   static String _lastRequestNumber = 'REQ-1005';
 
   static String getNextRequestNumber() {
@@ -17,7 +17,7 @@ class MaintenanceService {
   static Future<List<MaintenanceRequest>> getMaintenanceRequests() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/maintenanceRequest'));
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => MaintenanceRequest.fromJson(json)).toList();
