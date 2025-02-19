@@ -15,6 +15,9 @@ class RoomDetailPage extends StatefulWidget {
 
 class _RoomDetailPageState extends State<RoomDetailPage>
     with SingleTickerProviderStateMixin {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   static const Color primaryBlue = Color(0xFF2196F3);
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color cardBackground = Color(0xFFF5F7FA);
@@ -212,6 +215,15 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     );
   }
 
+  List<MaintenanceRequest> get _filteredMaintenanceRequests {
+    if (_searchQuery.isEmpty) return _maintenanceRequests;
+    return _maintenanceRequests
+        .where((request) => request.maintenanceTitle
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
+        .toList();
+  }
+
   Widget _buildMaintenanceTab() {
     final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
@@ -293,36 +305,83 @@ class _RoomDetailPageState extends State<RoomDetailPage>
             ),
           ),
           const SizedBox(height: 16),
+          TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search maintenance requests...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _searchQuery = value;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
           _isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _maintenanceRequests.length,
+                  itemCount: _filteredMaintenanceRequests.length,
                   itemBuilder: (context, index) {
-                    final request = _maintenanceRequests[index];
+                    final request = _filteredMaintenanceRequests[index];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        title: Text(request.maintenanceTitle),
-                        subtitle: Column(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(request.maintenanceStatement),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    request.maintenanceTitle,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange[100],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    request.requestStatus == 0
+                                        ? 'Pending'
+                                        : 'Done',
+                                    style: TextStyle(
+                                      color: request.requestStatus == 0
+                                          ? Colors.orange[900]
+                                          : Colors.green[900],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             const SizedBox(height: 4),
                             Text(
-                              'Request Number: ${request.requestNumber}',
+                              request.maintenanceStatement,
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 12,
                               ),
-                            ),
-                            Text(
-                              'Status: ${_getStatusText(request.requestStatus)}',
-                              style: TextStyle(
-                                color: _getStatusColor(request.requestStatus),
-                                fontWeight: FontWeight.bold,
-                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

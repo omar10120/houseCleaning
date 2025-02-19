@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   child: Text(
-                    '${l10n.floor} ${floors[index].name}',
+                    '${l10n.floor} ${floors[index].code}',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: selectedFloorIndex == index
@@ -168,6 +168,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -189,7 +190,8 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               Text(
                 l10n.cleaning,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -258,6 +260,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   Widget _buildRoomCard(Room room) {
     final l10n = AppLocalizations.of(context)!;
     return AnimatedContainer(
@@ -338,7 +341,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: _getStatusColor(room.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -379,7 +383,8 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildInfoItem(Icons.landscape, l10n.backView),
-                      _buildInfoItem(Icons.bed, '${room.badsNumber} ${l10n.beds}'),
+                      _buildInfoItem(
+                          Icons.bed, '${room.badsNumber} ${l10n.beds}'),
                       _buildInfoItem(Icons.apartment, l10n.suite),
                     ],
                   ),
@@ -387,7 +392,8 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 255, 245, 240),
                     borderRadius: BorderRadius.circular(12),
@@ -424,6 +430,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   Widget _buildInfoItem(IconData icon, String text) {
     return Row(
       children: [
@@ -440,6 +447,7 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
   Widget _buildStatusDropdown(Room room) {
     final l10n = AppLocalizations.of(context)!;
     final Map<int, String> statusOptions = {
