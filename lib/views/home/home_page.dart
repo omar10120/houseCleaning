@@ -109,38 +109,57 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildFloorButtons() {
     final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: List.generate(
-          floors.length,
-          (index) => Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  selectedFloorIndex = index;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    selectedFloorIndex == index ? Colors.black : Colors.grey[300],
-                foregroundColor:
-                    selectedFloorIndex == index ? Colors.white : Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-              ),
-              child: Text(
-                '${l10n.floor} ${floors[index].name}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: List.generate(
+            floors.length,
+            (index) => Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedFloorIndex = index;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedFloorIndex == index
+                        ? Colors.blue
+                        : Colors.white,
+                    foregroundColor: selectedFloorIndex == index
+                        ? Colors.white
+                        : Colors.blue,
+                    elevation: selectedFloorIndex == index ? 8 : 2,
+                    shadowColor: Colors.blue.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      side: BorderSide(
+                        color: selectedFloorIndex == index
+                            ? Colors.transparent
+                            : Colors.blue.withOpacity(0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 14,
+                    ),
+                  ),
+                  child: Text(
+                    '${l10n.floor} ${floors[index].name}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: selectedFloorIndex == index
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -149,14 +168,16 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final List<Widget> pages = [
       PageStorage(
         bucket: PageStorageBucket(),
-        child: _buildHomeContent(),
+        child: RefreshIndicator(
+          onRefresh: fetchFloors,
+          child: _buildHomeContent(),
+        ),
       ),
       PageStorage(
         bucket: PageStorageBucket(),
@@ -191,6 +212,16 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.blue, Colors.lightBlueAccent],
+            ),
+          ),
+        ),
         title: Text(
           _currentIndex == 0
               ? l10n.appName
@@ -199,123 +230,216 @@ class _HomePageState extends State<HomePage> {
                   : _currentIndex == 2
                       ? l10n.settings
                       : l10n.profile,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
       ),
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: pages[_currentIndex],
+      ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: BottomNavBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
       ),
     );
   }
-
   Widget _buildRoomCard(Room room) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      margin: const EdgeInsets.all(8),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RoomDetailPage(room: room),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${l10n.room} ${room.name}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.black12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: _getStatusColor(room.status).withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoomDetailPage(room: room),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.hotel,
+                            color: Colors.blue,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${l10n.room} ${room.name}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.favorite_border,
+                        color: Colors.red,
+                        size: 28,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                    color: Colors.grey.shade50,
+                  ),
+                  child: _buildStatusDropdown(room),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(room.status).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _getStatusColor(room.status).withOpacity(0.5),
+                      width: 1,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildStatusDropdown(room),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(room.status),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _getStatusText(room.status),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.landscape,
-                          size: 18, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      Text(l10n.backView),
+                      Icon(
+                        Icons.circle,
+                        size: 12,
+                        color: _getStatusColor(room.status),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getStatusText(room.status),
+                        style: TextStyle(
+                          color: _getStatusColor(room.status),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      const Icon(Icons.bed,
-                          size: 18, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      Text('${room.badsNumber} ${l10n.beds}'),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.apartment,
-                          size: 18, color: Colors.black54),
-                      const SizedBox(width: 4),
-                      Text(l10n.suite),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 223, 69, 13),
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildInfoItem(Icons.landscape, l10n.backView),
+                      _buildInfoItem(Icons.bed, '${room.badsNumber} ${l10n.beds}'),
+                      _buildInfoItem(Icons.apartment, l10n.suite),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 255, 245, 240),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color.fromARGB(255, 223, 69, 13),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.cleaning_services,
+                        color: const Color.fromARGB(255, 223, 69, 13),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 223, 69, 13),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
+  Widget _buildInfoItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
   Widget _buildStatusDropdown(Room room) {
     final l10n = AppLocalizations.of(context)!;
     final Map<int, String> statusOptions = {
