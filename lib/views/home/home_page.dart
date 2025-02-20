@@ -130,13 +130,13 @@ class _HomePageState extends State<HomePage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: selectedFloorIndex == index
-                        ? Colors.blue
+                        ? const Color(0xFF3F51B5)
                         : Colors.white,
                     foregroundColor: selectedFloorIndex == index
                         ? Colors.white
-                        : Colors.blue,
-                    elevation: selectedFloorIndex == index ? 8 : 2,
-                    shadowColor: Colors.blue.withOpacity(0.3),
+                        : const Color(0xFF3F51B5),
+                    elevation: selectedFloorIndex == index ? 4 : 1,
+                    shadowColor: const Color(0xFF3F51B5).withOpacity(0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                       side: BorderSide(
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.blue, Colors.lightBlueAccent],
+              colors: [Color(0xFF3F51B5), Color(0xFF009688)],
             ),
           ),
         ),
@@ -267,8 +267,8 @@ class _HomePageState extends State<HomePage> {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Card(
-        elevation: 4,
-        shadowColor: Colors.black12,
+        elevation: 2,
+        shadowColor: const Color(0xFF4361EE).withOpacity(0.1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -299,12 +299,12 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: const Color(0xFF009688).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.hotel,
-                            color: Colors.blue,
+                            color: Color(0xFF009688),
                             size: 24,
                           ),
                         ),
@@ -322,7 +322,7 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                       icon: const Icon(
                         Icons.favorite_border,
-                        color: Colors.red,
+                        color: Color(0xFF3F51B5),
                         size: 28,
                       ),
                       onPressed: () {},
@@ -395,10 +395,10 @@ class _HomePageState extends State<HomePage> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 245, 240),
+                    color: const Color(0xFFE3F2FD),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color.fromARGB(255, 223, 69, 13),
+                      color: const Color(0xFF3F51B5),
                       width: 1,
                     ),
                   ),
@@ -406,7 +406,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Icon(
                         Icons.cleaning_services,
-                        color: const Color.fromARGB(255, 223, 69, 13),
+                        color: const Color(0xFF3F51B5),
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -414,7 +414,7 @@ class _HomePageState extends State<HomePage> {
                         child: Text(
                           '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
                           style: const TextStyle(
-                            color: Color.fromARGB(255, 223, 69, 13),
+                            color: Color(0xFF3F51B5),
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -434,7 +434,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildInfoItem(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: Colors.blue),
+        Icon(icon, size: 20, color: const Color(0xFF009688)),
         const SizedBox(width: 6),
         Text(
           text,
@@ -495,11 +495,11 @@ class _HomePageState extends State<HomePage> {
   Color _getStatusColor(int status) {
     switch (status) {
       case 0:
-        return Colors.green;
+        return const Color(0xFF009688); // Teal for clean
       case 1:
-        return Colors.orange;
+        return const Color(0xFF3F51B5); // Blue for clean request
       case 2:
-        return Colors.red;
+        return const Color(0xFF1A237E); // Deep blue for out of service
       default:
         return Colors.black54;
     }

@@ -15,9 +15,6 @@ class RoomDetailPage extends StatefulWidget {
 
 class _RoomDetailPageState extends State<RoomDetailPage>
     with SingleTickerProviderStateMixin {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
   static const Color primaryBlue = Color(0xFF2196F3);
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color cardBackground = Color(0xFFF5F7FA);
@@ -27,7 +24,9 @@ class _RoomDetailPageState extends State<RoomDetailPage>
       TextEditingController();
   final TextEditingController _maintenanceNoticeController =
       TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<MaintenanceRequest> _maintenanceRequests = [];
+  List<MaintenanceRequest> _filteredMaintenanceRequests = [];
   bool _isLoading = false;
 
   Map<String, bool> departmentChecklist = {
@@ -215,15 +214,6 @@ class _RoomDetailPageState extends State<RoomDetailPage>
     );
   }
 
-  List<MaintenanceRequest> get _filteredMaintenanceRequests {
-    if (_searchQuery.isEmpty) return _maintenanceRequests;
-    return _maintenanceRequests
-        .where((request) => request.maintenanceTitle
-            .toLowerCase()
-            .contains(_searchQuery.toLowerCase()))
-        .toList();
-  }
-
   Widget _buildMaintenanceTab() {
     final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
@@ -308,17 +298,19 @@ class _RoomDetailPageState extends State<RoomDetailPage>
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search maintenance requests...',
+              labelText: 'Search Maintenance Requests',
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             onChanged: (value) {
               setState(() {
-                _searchQuery = value;
+                _filteredMaintenanceRequests = _maintenanceRequests
+                    .where((request) =>
+                        request.maintenanceTitle.toLowerCase().contains(value.toLowerCase()) ||
+                        request.maintenanceStatement.toLowerCase().contains(value.toLowerCase()))
+                    .toList();
               });
             },
           ),
@@ -328,13 +320,17 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _filteredMaintenanceRequests.length,
+                  itemCount: _searchController.text.isEmpty
+                      ? _maintenanceRequests.length
+                      : _filteredMaintenanceRequests.length,
                   itemBuilder: (context, index) {
-                    final request = _filteredMaintenanceRequests[index];
+                    final request = _searchController.text.isEmpty
+                        ? _maintenanceRequests[index]
+                        : _filteredMaintenanceRequests[index];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -343,32 +339,18 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                                 Expanded(
                                   child: Text(
                                     request.maintenanceTitle,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange[100],
+                                    color: Colors.orange.shade100,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    request.requestStatus == 0
-                                        ? 'Pending'
-                                        : 'Done',
-                                    style: TextStyle(
-                                      color: request.requestStatus == 0
-                                          ? Colors.orange[900]
-                                          : Colors.green[900],
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    'REQ-${request.requestNumber}',
+                                    style: TextStyle(fontSize: 12, color: Colors.orange.shade900),
                                   ),
                                 ),
                               ],
@@ -376,10 +358,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                             const SizedBox(height: 4),
                             Text(
                               request.maintenanceStatement,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
+                              style: const TextStyle(fontSize: 13, color: Colors.black54),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
