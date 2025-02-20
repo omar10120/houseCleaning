@@ -308,8 +308,12 @@ class _RoomDetailPageState extends State<RoomDetailPage>
               setState(() {
                 _filteredMaintenanceRequests = _maintenanceRequests
                     .where((request) =>
-                        request.maintenanceTitle.toLowerCase().contains(value.toLowerCase()) ||
-                        request.maintenanceStatement.toLowerCase().contains(value.toLowerCase()))
+                        request.maintenanceTitle
+                            .toLowerCase()
+                            .contains(value.toLowerCase()) ||
+                        request.maintenanceStatement
+                            .toLowerCase()
+                            .contains(value.toLowerCase()))
                     .toList();
               });
             },
@@ -339,18 +343,24 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                                 Expanded(
                                   child: Text(
                                     request.maintenanceTitle,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.orange.shade100,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    'REQ-${request.requestNumber}',
-                                    style: TextStyle(fontSize: 12, color: Colors.orange.shade900),
+                                    request.requestStatus == 0
+                                        ? 'Pending'
+                                        : 'Done',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.orange.shade900),
                                   ),
                                 ),
                               ],
@@ -358,7 +368,8 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                             const SizedBox(height: 4),
                             Text(
                               request.maintenanceStatement,
-                              style: const TextStyle(fontSize: 13, color: Colors.black54),
+                              style: const TextStyle(
+                                  fontSize: 13, color: Colors.black54),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),

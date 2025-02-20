@@ -235,9 +235,24 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
-            color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, size: 24, color: Color(0xFF3F51B5)),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
         centerTitle: true,
       ),
       body: AnimatedSwitcher(
@@ -267,13 +282,16 @@ class _HomePageState extends State<HomePage> {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Card(
-        elevation: 2,
-        shadowColor: const Color(0xFF4361EE).withOpacity(0.1),
+        elevation: 4,
+        shadowColor: const Color(0xFF4361EE).withOpacity(0.2),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF2A2D3E)
+            : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: _getStatusColor(room.status).withOpacity(0.3),
-            width: 1,
+            color: _getStatusColor(room.status).withOpacity(0.4),
+            width: 1.5,
           ),
         ),
         child: InkWell(
@@ -314,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Color(0xFF3F51B5),
                           ),
                         ),
                       ],
@@ -334,8 +352,11 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                    color: Colors.grey.shade50,
+                    border: Border.all(color: const Color(0xFF3F4252)),
+                    // color: const Color(0xFF2A2D3E),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF2A2D3E)
+                        : Colors.white,
                   ),
                   child: _buildStatusDropdown(room),
                 ),
@@ -375,9 +396,11 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF2A2D3E)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: const Color(0xFF2D303F)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -438,10 +461,12 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 6),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFFCACDDB)
+                : const Color(0xFF2A2D3E),
           ),
         ),
       ],
@@ -458,9 +483,14 @@ class _HomePageState extends State<HomePage> {
 
     return DropdownButton<int>(
       value: room.status,
-      icon: const Icon(Icons.arrow_drop_down),
+      icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF3F51B5)),
       isExpanded: true,
-      style: const TextStyle(fontSize: 16, color: Colors.black),
+      dropdownColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF2A2D3E)
+          : Colors.white,
+      style: Theme.of(context).brightness == Brightness.dark
+          ? const TextStyle(fontSize: 16, color: Colors.white)
+          : const TextStyle(fontSize: 16, color: Color(0xFF2A2D3E)),
       onChanged: (int? newStatus) {
         if (newStatus != null) {
           setState(() {

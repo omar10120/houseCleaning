@@ -4,11 +4,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'views/auth/login_page.dart';
 import 'providers/language_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LanguageProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -34,10 +38,7 @@ class MyApp extends StatelessWidget {
             Locale('en'),
             Locale('ar'),
           ],
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            fontFamily: 'Roboto',
-          ),
+          theme: Provider.of<ThemeProvider>(context).currentTheme,
           home: const LoginPage(),
         );
       },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import '../../providers/theme_provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -14,23 +16,21 @@ class ProfilePage extends StatelessWidget {
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(l10n.profile),
+              // title: Text(l10n.profile),
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.blue.shade800,
-                      Colors.blue.shade500,
-                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF3F51B5), Color(0xFF009688)],
                   ),
                 ),
                 child: const Center(
                   child: CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 50, color: Colors.blue),
+                    child:
+                        Icon(Icons.person, size: 50, color: Color(0xFF3F51B5)),
                   ),
                 ),
               ),
@@ -44,7 +44,7 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   _buildInfoCard(context),
                   const SizedBox(height: 16),
-                  _buildStatsCard(context),
+                  // _buildStatsCard(context),
                   const SizedBox(height: 16),
                   _buildSettingsSection(context),
                 ],
@@ -132,37 +132,39 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildSettingsTile(
-            icon: Icons.notifications,
-            title: l10n.notifications,
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
+          // _buildSettingsTile(
+          //   icon: Icons.notifications,
+          //   title: l10n.notifications,
+          //   trailing: Switch(
+          //     value: true,
+          //     onChanged: (value) {},
+          //   ),
+          // ),
           const Divider(height: 1),
           _buildSettingsTile(
             icon: Icons.dark_mode,
             title: l10n.darkMode,
-            trailing: Switch(
-              value: false,
-              onChanged: (value) {},
+            trailing: Consumer<ThemeProvider>(
+              builder: (context, themeProvider, child) => Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (value) => themeProvider.toggleTheme(),
+              ),
             ),
           ),
           const Divider(height: 1),
-          _buildSettingsTile(
-            icon: Icons.security,
-            title: l10n.privacy,
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
-          const Divider(height: 1),
-          _buildSettingsTile(
-            icon: Icons.help,
-            title: l10n.help,
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
-          ),
+          // _buildSettingsTile(
+          //   icon: Icons.security,
+          //   title: l10n.privacy,
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
+          // const Divider(height: 1),
+          // _buildSettingsTile(
+          //   icon: Icons.help,
+          //   title: l10n.help,
+          //   trailing: const Icon(Icons.chevron_right),
+          //   onTap: () {},
+          // ),
         ],
       ),
     );
