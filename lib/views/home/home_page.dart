@@ -334,8 +334,8 @@ class _HomePageState extends State<HomePage> {
                             fontWeight: FontWeight.bold,
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? const Color(0xFF2A2D3E)
-                                    : Colors.white,
+                                    ? Colors.white
+                                    : const Color(0xFF2A2D3E),
                           ),
                         ),
                       ],
