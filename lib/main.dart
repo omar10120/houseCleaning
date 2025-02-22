@@ -5,8 +5,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'views/auth/login_page.dart';
 import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
+import 'cache_helper.dart';
 
 void main() {
+  CacheHelper().init();
   runApp(
     MultiProvider(
       providers: [

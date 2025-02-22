@@ -333,45 +333,15 @@ class _RoomDetailPageState extends State<RoomDetailPage>
                         : _filteredMaintenanceRequests[index];
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
+                      child: ListTile(
+                        title: Text(request.maintenanceTitle),
+                        subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    request.maintenanceTitle,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.shade100,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    request.requestStatus == 0
-                                        ? 'Pending'
-                                        : 'Done',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.orange.shade900),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            Text(request.maintenanceStatement),
                             const SizedBox(height: 4),
                             Text(
-                              request.maintenanceStatement,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.black54),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              'Request Number: ${request.requestNumber}',
                             ),
                           ],
                         ),

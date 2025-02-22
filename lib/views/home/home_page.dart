@@ -329,10 +329,13 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(width: 12),
                         Text(
                           '${l10n.room} ${room.name}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF3F51B5),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2D3E)
+                                    : Colors.white,
                           ),
                         ),
                       ],
@@ -348,49 +351,55 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF3F4252)),
-                    // color: const Color(0xFF2A2D3E),
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF2A2D3E)
-                        : Colors.white,
-                  ),
-                  child: _buildStatusDropdown(room),
-                ),
                 const SizedBox(height: 20),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(room.status).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _getStatusColor(room.status).withOpacity(0.5),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 12,
-                        color: _getStatusColor(room.status),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF3F4252)),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF2A2D3E)
+                              : Colors.white,
+                        ),
+                        child: _buildStatusDropdown(room),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _getStatusText(room.status),
-                        style: TextStyle(
-                          color: _getStatusColor(room.status),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(room.status).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _getStatusColor(room.status).withOpacity(0.5),
+                          width: 1,
                         ),
                       ),
-                    ],
-                  ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 12,
+                            color: _getStatusColor(room.status),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _getStatusText(room.status),
+                            style: TextStyle(
+                              color: _getStatusColor(room.status),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
                 Container(
@@ -413,39 +422,39 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE3F2FD),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFF3F51B5),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.cleaning_services,
-                        color: const Color(0xFF3F51B5),
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
-                          style: const TextStyle(
-                            color: Color(0xFF3F51B5),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   padding:
+                //       const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                //   decoration: BoxDecoration(
+                //     color: const Color(0xFFE3F2FD),
+                //     borderRadius: BorderRadius.circular(12),
+                //     border: Border.all(
+                //       color: const Color(0xFF3F51B5),
+                //       width: 1,
+                //     ),
+                //   ),
+                //   child: Row(
+                //     children: [
+                //       Icon(
+                //         Icons.cleaning_services,
+                //         color: const Color(0xFF3F51B5),
+                //         size: 20,
+                //       ),
+                //       const SizedBox(width: 8),
+                //       Expanded(
+                //         child: Text(
+                //           '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
+                //           style: const TextStyle(
+                //             color: Color(0xFF3F51B5),
+                //             fontSize: 16,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/language_provider.dart';
-// import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,7 +14,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  // QRViewController? controller;
+  QRViewController? controller;
   String? scannedApiUrl;
   bool isFlashOn = false;
   bool isFrontCamera = false;
@@ -36,22 +36,22 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  // void _onQRViewCreated(QRViewController controller) {
-  //   this.controller = controller;
-  //   controller.scannedDataStream.listen((scanData) {
-  //     setState(() {
-  //       scannedApiUrl = scanData.code;
-  //       _isScanning = false;
-  //     });
-  //     controller.dispose();
-  //   });
-  // }
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        scannedApiUrl = scanData.code;
+        _isScanning = false;
+      });
+      controller.dispose();
+    });
+  }
 
-  // @override
-  // void dispose() {
-  //   controller?.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,17 +162,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 clipBehavior: Clip.hardEdge,
                 child: Stack(
                   children: [
-                    // QRView(
-                    //   key: qrKey,
-                    //   onQRViewCreated: _onQRViewCreated,
-                    //   overlay: QrScannerOverlayShape(
-                    //     borderColor: Colors.blue,
-                    //     borderRadius: 10,
-                    //     borderLength: 30,
-                    //     borderWidth: 10,
-                    //     cutOutSize: 300,
-                    //   ),
-                    // ),
+                    QRView(
+                      key: qrKey,
+                      onQRViewCreated: _onQRViewCreated,
+                      overlay: QrScannerOverlayShape(
+                        borderColor: Colors.blue,
+                        borderRadius: 10,
+                        borderLength: 30,
+                        borderWidth: 10,
+                        cutOutSize: 300,
+                      ),
+                    ),
                     Positioned(
                       bottom: 16,
                       left: 0,
