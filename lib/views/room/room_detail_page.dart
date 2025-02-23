@@ -99,7 +99,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
   Future<void> _loadMaintenanceRequests() async {
     setState(() => _isLoading = true);
     try {
-      final requests = await MaintenanceService.getMaintenanceRequests();
+      final requests = await MaintenanceService().getMaintenanceRequests();
       setState(() {
         _maintenanceRequests = requests;
         _isLoading = false;
@@ -123,7 +123,7 @@ class _RoomDetailPageState extends State<RoomDetailPage>
 
     setState(() => _isLoading = true);
     try {
-      await MaintenanceService.createMaintenanceRequest(
+      await MaintenanceService().createMaintenanceRequest(
         maintenanceTitle: _maintenanceTitleController.text,
         maintenanceStatement: _maintenanceNoticeController.text,
         roomNumber: widget.room.number.toString(),
