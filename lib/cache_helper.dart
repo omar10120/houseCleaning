@@ -1,11 +1,11 @@
-import 'package:shared_preferences_windows/shared_preferences_windows.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheHelper {
-  static late SharedPreferencesWindows sharedPreferences;
+  static late SharedPreferences sharedPreferences;
 
 //! Here The Initialize of cache .
   init() async {
-    SharedPreferencesWindows = await SharedPreferencesWindows.getInstance();
+    sharedPreferences = await SharedPreferences.getInstance();
   }
   // @override
   // void onInit() async{
@@ -15,7 +15,7 @@ class CacheHelper {
   // }
 
   String? getDataString({required String key}) {
-    return SharedPreferencesWindows.getString(key);
+    return sharedPreferences.getString(key);
   }
 
 //! this method to put data in local database using key

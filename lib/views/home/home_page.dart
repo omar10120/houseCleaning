@@ -284,9 +284,7 @@ class _HomePageState extends State<HomePage> {
       child: Card(
         elevation: 4,
         shadowColor: const Color(0xFF4361EE).withOpacity(0.2),
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF2A2D3E)
-            : Colors.white,
+        color: const Color(0xFF2A2D3E),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -329,13 +327,10 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(width: 12),
                         Text(
                           '${l10n.room} ${room.name}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : const Color(0xFF2A2D3E),
+                            color: Color(0xFFE4E6F3),
                           ),
                         ),
                       ],
@@ -351,63 +346,52 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF3F4252)),
+                    color: const Color(0xFF2A2D3E),
+                  ),
+                  child: _buildStatusDropdown(room),
+                ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF3F4252)),
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF2A2D3E)
-                              : Colors.white,
-                        ),
-                        child: _buildStatusDropdown(room),
-                      ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(room.status).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _getStatusColor(room.status).withOpacity(0.5),
+                      width: 1,
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(room.status).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _getStatusColor(room.status).withOpacity(0.5),
-                          width: 1,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.circle,
+                        size: 12,
+                        color: _getStatusColor(room.status),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getStatusText(room.status),
+                        style: TextStyle(
+                          color: _getStatusColor(room.status),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.circle,
-                            size: 12,
-                            color: _getStatusColor(room.status),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _getStatusText(room.status),
-                            style: TextStyle(
-                              color: _getStatusColor(room.status),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF2A2D3E)
-                        : Colors.white,
+                    color: const Color(0xFF1F1D2B),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFF2D303F)),
                   ),
@@ -422,39 +406,39 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Container(
-                //   width: double.infinity,
-                //   padding:
-                //       const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                //   decoration: BoxDecoration(
-                //     color: const Color(0xFFE3F2FD),
-                //     borderRadius: BorderRadius.circular(12),
-                //     border: Border.all(
-                //       color: const Color(0xFF3F51B5),
-                //       width: 1,
-                //     ),
-                //   ),
-                //   child: Row(
-                //     children: [
-                //       Icon(
-                //         Icons.cleaning_services,
-                //         color: const Color(0xFF3F51B5),
-                //         size: 20,
-                //       ),
-                //       const SizedBox(width: 8),
-                //       Expanded(
-                //         child: Text(
-                //           '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
-                //           style: const TextStyle(
-                //             color: Color(0xFF3F51B5),
-                //             fontSize: 16,
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE3F2FD),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFF3F51B5),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.cleaning_services,
+                        color: const Color(0xFF3F51B5),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${l10n.lastClean}: ${room.lastClean ?? l10n.notCleaned}',
+                          style: const TextStyle(
+                            color: Color(0xFF3F51B5),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -470,12 +454,10 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 6),
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFFCACDDB)
-                : const Color(0xFF2A2D3E),
+            color: Color(0xFFCACDDB),
           ),
         ),
       ],
@@ -494,12 +476,8 @@ class _HomePageState extends State<HomePage> {
       value: room.status,
       icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF3F51B5)),
       isExpanded: true,
-      dropdownColor: Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF2A2D3E)
-          : Colors.white,
-      style: Theme.of(context).brightness == Brightness.dark
-          ? const TextStyle(fontSize: 16, color: Colors.white)
-          : const TextStyle(fontSize: 16, color: Color(0xFF2A2D3E)),
+      dropdownColor: const Color(0xFF2A2D3E),
+      style: const TextStyle(fontSize: 16, color: Color(0xFFE4E6F3)),
       onChanged: (int? newStatus) {
         if (newStatus != null) {
           setState(() {

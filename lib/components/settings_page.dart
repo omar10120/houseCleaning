@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:housekeepingsamafinal/cache_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/language_provider.dart';
@@ -41,6 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         scannedApiUrl = scanData.code;
+        CacheHelper().saveData(key: "qr", value: "${scannedApiUrl}");
         _isScanning = false;
       });
       controller.dispose();
@@ -117,33 +119,33 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildSettingsUI() {
     return ListView(
       children: [
-        Card(
-          child: ListTile(
-            title: Text(AppLocalizations.of(context)!.selectLanguage),
-            trailing: Consumer<LanguageProvider>(
-              builder: (context, languageProvider, child) {
-                return DropdownButton<String>(
-                  value: languageProvider.currentLocale.languageCode,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'en',
-                      child: Text('English'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'ar',
-                      child: Text('العربية'),
-                    ),
-                  ],
-                  onChanged: (String? newValue) {
-                    // if (newValue != null) {
-                    //   languageProvider.changeLanguage(newValue);
-                    // }
-                  },
-                );
-              },
-            ),
-          ),
-        ),
+        // Card(
+        //   child: ListTile(
+        //     title: Text(AppLocalizations.of(context)!.selectLanguage),
+        //     trailing: Consumer<LanguageProvider>(
+        //       builder: (context, languageProvider, child) {
+        //         return DropdownButton<String>(
+        //           value: languageProvider.currentLocale.languageCode,
+        //           items: [
+        //             DropdownMenuItem(
+        //               value: 'en',
+        //               child: Text('English'),
+        //             ),
+        //             DropdownMenuItem(
+        //               value: 'ar',
+        //               child: Text('العربية'),
+        //             ),
+        //           ],
+        //           onChanged: (String? newValue) {
+        //             if (newValue != null) {
+        //               languageProvider.changeLanguage(newValue);
+        //             }
+        //           },
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 16),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +300,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       onPressed: () {
                         setState(() {
                           _isScanning = true;
-                          scannedApiUrl = null;
                         });
                       },
                     ),
@@ -317,7 +318,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         onPressed: () {
-                          // TODO: Save the scanned API URL
+                          // Save the scanned API URL to local storage
+                          CacheHelper()
+                              .saveData(key: "api_url", value: scannedApiUrl);
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("API URL updated successfully"),

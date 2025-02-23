@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:housekeepingsamafinal/providers/language_provider.dart';
 import 'package:provider/provider.dart';
 import '../../providers/theme_provider.dart';
 
@@ -152,6 +153,34 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
+          Card(
+            child: ListTile(
+              title: Text(AppLocalizations.of(context)!.selectLanguage),
+              trailing: Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return DropdownButton<String>(
+                    value: languageProvider.currentLocale.languageCode,
+                    items: [
+                      DropdownMenuItem(
+                        value: 'en',
+                        child: Text('English'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'ar',
+                        child: Text('العربية'),
+                      ),
+                    ],
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        languageProvider.changeLanguage(newValue);
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+
           // _buildSettingsTile(
           //   icon: Icons.security,
           //   title: l10n.privacy,

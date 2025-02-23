@@ -5,6 +5,7 @@ import '../home/home_page.dart';
 import '/components/settings_page.dart';
 import '../about/about_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../config/api_config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http
-          .get(Uri.parse('http://94.127.214.117:3000/api/houseKeepers'));
+          .get(Uri.parse(ApiConfig.houseKeepersEndpoint));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
