@@ -4,14 +4,16 @@ import 'package:housekeepingsamafinal/controller/api_data_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'views/auth/login_page.dart';
 import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
 import 'package:get/get.dart';
 
-void main() {
-  CacheHelper().init();
-  Get.put(ApiDataRepository());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CacheHelper().init();
+  await Get.put(ApiDataRepository());
   runApp(
     MultiProvider(
       providers: [
