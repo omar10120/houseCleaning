@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:housekeepingsamafinal/config/api_config.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/room.dart';
@@ -30,8 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchFloors() async {
     try {
-      final response = await http
-          .get(Uri.parse('http://94.127.214.117:3000/api/hotel-floors'));
+      final response = await http.get(Uri.parse(ApiConfig.hotelFloorsEndpoint));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> updateRoomStatus(String roomGuid, int newStatus) async {
     try {
       final response = await http.patch(
-        Uri.parse('http://94.127.214.117:3000/api/hotel-floors'),
+        Uri.parse(ApiConfig.hotelFloorsEndpoint),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'roomGuid': roomGuid, 'status': newStatus}),
       );

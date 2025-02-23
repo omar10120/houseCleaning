@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/maintenance_request.dart';
+import 'package:housekeepingsamafinal/config/api_config.dart';
 
 class MaintenanceService {
-  static const String baseUrl = 'http://94.127.214.117:3000/api';
+  static String baseUrl = ApiConfig.maintenanceRequestEndpoint;
   static String _lastRequestNumber = 'REQ-1005';
 
   static String getNextRequestNumber() {
@@ -16,7 +17,7 @@ class MaintenanceService {
 
   static Future<List<MaintenanceRequest>> getMaintenanceRequests() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/maintenanceRequest'));
+      final response = await http.get(Uri.parse(baseUrl));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
