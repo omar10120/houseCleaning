@@ -3,5 +3,5 @@ class ApiConfig {
 
   // API endpoints
   static String get hotelFloorsEndpoint => '$baseUrl/api/hotel-floors';
-  static String get houseKeepersEndpoint => '$baseUrl/aspi/houseKeepers';
+  static String get houseKeepersEndpoint => '$baseUrl/api/houseKeepers';
 }
